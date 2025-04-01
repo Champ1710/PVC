@@ -1,0 +1,107 @@
+Sure! Here is a comprehensive document that includes both the server setup and the configuration of a self-hosted GitHub Actions runner:
+
+---
+
+ Setting Up a Self-Hosted GitHub Actions Runner
+
+ Server Setup
+
+ Step 1: Prepare the Server
+
+1. Update the package list and install necessary packages:
+   
+   sudo apt-get update
+   sudo apt-get install -y curl tar
+   
+
+2. Create a directory for the GitHub Actions runner:
+   
+   mkdir -p /actions-runner
+   cd /actions-runner
+   
+
+ Step 2: Download and Extract the Runner
+
+1. Download the latest runner package:
+   
+   curl -o actions-runner-linux-x64-2.307.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.307.0/actions-runner-linux-x64-2.307.0.tar.gz
+   
+
+2. Extract the runner package:
+   
+   tar xzf ./actions-runner-linux-x64-2.307.0.tar.gz
+   
+
+ Step 3: Configure the GitHub Actions Runner
+
+ Register the Runner with GitHub
+
+1. Get the Registration Token:
+   - Go to your GitHub repository or organization settings.
+   - Navigate to Settings > Actions > Self-hosted runners > Add runner.
+   - Copy the registration token provided.
+
+2. Configure the Runner:
+   - Run the following command to configure the GitHub Actions runner, replacing YOUR_TOKEN with the registration token you copied from GitHub:
+     
+     ./config.sh --url https://github.com/Champ1710/PVC --token YOUR_TOKEN --work /mnt/storage/github/actions
+     
+
+ Step 4: Start the GitHub Actions Runner
+
+- Start the runner with:
+  
+  ./run.sh
+  
+  This will start the runner and it will begin listening for jobs from your GitHub repository. The runner will store its data (logs, state, etc.) in the persistent directory you specified (/mnt/storage/github/actions).
+
+ Step 5: Ensure the Runner Starts Automatically on Reboot
+
+ Create a systemd Service File
+
+1. Create a new service file for the GitHub Actions runner:
+   
+   sudo nano /etc/systemd/system/github-actions-runner.service
+   
+
+2. Add the following contents to the service file:
+   ini
+   [Unit]
+   Description=GitHub Actions Runner
+   After=network.target
+
+   [Service]
+   ExecStart=/path/to/your/runner/run.sh
+   User=your-user
+   WorkingDirectory=/mnt/storage/github/actions
+   Restart=always
+
+   [Install]
+   WantedBy=multi-user.target
+   
+
+3. Replace your-user with the actual username you're using to run the actions runner.
+
+ Enable and Start the Service
+
+1. Reload systemd to recognize the new service:
+   
+   sudo systemctl daemon-reload
+   
+
+2. Enable the service to start on boot:
+   
+   sudo systemctl enable github-actions-runner
+   
+
+3. Start the service:
+   
+   sudo systemctl start github-actions-runner
+   
+
+ Step 6: Verify the Runner is Running
+
+- Check the status of the runner service:
+  
+  sudo systemctl status github-actions-runner
+

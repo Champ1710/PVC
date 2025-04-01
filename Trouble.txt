@@ -1,0 +1,50 @@
+sudo su
+    2  cd actions-runner
+    3  ./config.sh --url https://github.com/Champ1710/PVC --token BFUEGX45STPJPBI4LEPMJYTH5P6QU
+    4  chmod +x ./bin/libcoreclr.so
+    5  chmod +x ./bin/libSystem.Security.Cryptography.Native.OpenSsl.so
+    6  chmod +x ./bin/libSystem.IO.Compression.Native.so
+    7  sudo su
+    8  ./config.sh --url https://github.com/Champ1710/PVC --token BFUEGX45STPJPBI4LEPMJYTH5P6QU
+    9  sudo su
+   10  ./config.sh --url https://github.com/Champ1710/PVC --token BFUEGX45STPJPBI4LEPMJYTH5P6QU
+   11  ./run.sh
+   12  sudo nano /etc/systemd/system/github-actions-runner.service
+   13  sudo systemctl daemon-reload
+   14  sudo systemctl enable github-actions-runner.service
+   15  sudo systemctl start github-actions-runner.service
+   16  sudo systemctl status github-actions-runner.service
+   17  sudo nano /etc/systemd/system/github-actions-runner.service
+   18  sudo systemctl restart github-actions-runner.service
+   19  sudo systemctl daemon-reload
+   20  sudo systemctl restart github-actions-runner.service
+   21  sudo systemctl status github-actions-runner.service
+   22  chcon system_u:object_r:usr_t:s0 /home/your-user/actions-runner/run.sh.
+   23  ./run.sh
+   24  chcon system_u:object_r:usr_t:s0 /home/your-user/actions-runner/run.sh.
+   25  sudo systemctl status github-actions-runner.service
+   26  ./run.sh
+   27  sudo nano /etc/systemd/system/github-actions-runner.service
+   28  sudo systemctl daemon-reload
+   29  sudo systemctl restart github-actions-runner.service
+   30  sudo systemctl status github-actions-runner.service
+   31  ./run.sh
+   32  sudo systemctl status github-actions-runner.service
+   33  history
+===============================================================================================
+mkdir actions-runner
+    2  cd actions-runner
+    3  curl -o actions-runner-linux-x64-2.323.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.323.0/actions-runner-linux-x64-2.323.0.tar.gz
+    4  echo "0dbc9bf5a58620fc52cb6cc0448abcca964a8d74b5f39773b7afcad9ab691e19  actions-runner-linux-x64-2.323.0.tar.gz" | shasum -a 256 -c
+    5  tar xzf ./actions-runner-linux-x64-2.323.0.tar.gz
+    6  ./config.sh --url https://github.com/Champ1710/PVC --token BFUEGX45STPJPBI4LEPMJYTH5P6QU
+    7  exit
+    8  chmod +x ./bin/libcoreclr.so
+    9  chmod +x ./bin/libSystem.Security.Cryptography.Native.OpenSsl.so
+   10  chmod +x ./bin/libSystem.IO.Compression.Native.so
+   11  sudo ./config.sh --url https://github.com/Champ1710/PVC --token BFUEGX45STPJPBI4LEPMJYTH5P6QU
+   12  exit
+   13  sudo chown -R azure:azure /home/azure/actions-runner
+   14  sudo chmod -R 755 /home/azure/actions-runner
+   15  exit
+   16  history
