@@ -4,7 +4,7 @@
 name: $(Date:yyyyMMdd)$(Rev:.r)
 
 # Disable triggering from code updates to repo
-trigger: none
+trigger: on
 
 # Set up to trigger release on completion of build pipeline
 resources:
