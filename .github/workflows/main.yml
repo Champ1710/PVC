@@ -1,46 +1,40 @@
-# https://aka.ms/yaml
-# File: azure-pipelines-release.yml
+name: Release Workflow
 
-name: $(Date:yyyyMMdd)$(Rev:.r)
+# Disable automatic triggers; allow only manual runs
+on:
+  workflow_dispatch:
 
-# Disable triggering from code updates to repo
-trigger: on
+jobs:
+  stage-a:
+    name: Stage A
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    outputs:
+      stage-a-outcome: ${{ job.status }}
+    steps:
+      - name: Run Stage A
+        run: |
+          echo "Running Stage A"
+          exit 1  # simulate failure for testing
 
-# Set up to trigger release on completion of build pipeline
-resources:
-  repositories:
-    - repository: templates
-      type: github
-      name: 'Hillrom-Enterprise/bdhp-platform'
-      ref: 'refs/heads/dev'
-      endpoint: 'Hillrom-Enterprise-IAC - BDHP GA - POC-BDHP'
-    
-    - repository: bdhp-infrastructure-terraform-config
-      type: github
-      name: 'Hillrom-Enterprise/bdhp-infrastructure-terraform-config'
-      ref: 'refs/heads/dev'
-      endpoint: 'Hillrom-Enterprise-IAC - BDHP GA - POC-BDHP'
+  stage-b:
+    name: Stage B (runs if A fails)
+    needs: stage-a
+    if: needs.stage-a.result == 'failure'
+    runs-on: ubuntu-latest
+    outputs:
+      stage-b-outcome: ${{ job.status }}
+    steps:
+      - name: Run Stage B
+        run: echo "Running Stage B"
 
-pool:
-  vmImage: ubuntu-latest
-
-extends:
-  template: workflow-templates/ci-cd/release/stages/aks_release_stages.yaml@templates  # Template reference
-  parameters:
-    deploymentType: 'terraform'
-    terraformStack: 'platform-monitoring'
-    includeAllStages: 'true'
-
-stages:
-- stage: A
-
-# stage B runs if A fails
-- stage: B
-  condition: failed()
-
-# stage C runs if B succeeds
-- stage: C
-  dependsOn:
-  - A
-  - B
-  condition: succeeded('B')
+  stage-c:
+    name: Stage C (runs if B succeeds)
+    needs: [stage-a, stage-b]
+    if: >
+      needs.stage-a.result == 'failure' &&
+      needs.stage-b.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Stage C
+        run: echo "Running Stage C"
