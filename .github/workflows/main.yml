@@ -1,0 +1,46 @@
+# https://aka.ms/yaml
+# File: azure-pipelines-release.yml
+
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+# Disable triggering from code updates to repo
+trigger: none
+
+# Set up to trigger release on completion of build pipeline
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: 'Hillrom-Enterprise/bdhp-platform'
+      ref: 'refs/heads/dev'
+      endpoint: 'Hillrom-Enterprise-IAC - BDHP GA - POC-BDHP'
+    
+    - repository: bdhp-infrastructure-terraform-config
+      type: github
+      name: 'Hillrom-Enterprise/bdhp-infrastructure-terraform-config'
+      ref: 'refs/heads/dev'
+      endpoint: 'Hillrom-Enterprise-IAC - BDHP GA - POC-BDHP'
+
+pool:
+  vmImage: ubuntu-latest
+
+extends:
+  template: workflow-templates/ci-cd/release/stages/aks_release_stages.yaml@templates  # Template reference
+  parameters:
+    deploymentType: 'terraform'
+    terraformStack: 'platform-monitoring'
+    includeAllStages: 'true'
+
+stages:
+- stage: A
+
+# stage B runs if A fails
+- stage: B
+  condition: failed()
+
+# stage C runs if B succeeds
+- stage: C
+  dependsOn:
+  - A
+  - B
+  condition: succeeded('B')
