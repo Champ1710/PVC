@@ -1,0 +1,60 @@
+name: Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Change if needed
+
+jobs:
+  deploy-to-qa:
+    name: Deploy to QA
+    runs-on: self-hosted  # Runs on Monroe/Azure runner
+    environment: QA
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to QA Server
+        run: |
+          echo "Deploying to QA..."
+          # Example: Copying all files to the QA server
+          scp -r $GITHUB_WORKSPACE/* user@qa-server:/home/user/deployment/
+
+  approve-prod:
+    name: Approval for Production Deployment
+    needs: deploy-to-qa
+    runs-on: ubuntu-latest
+    environment: Prod
+    steps:
+      - name: Wait for Manual Approval
+        run: echo "Manual approval required in GitHub UI"
+
+  deploy-to-prod:
+    name: Deploy to Production
+    needs: approve-prod
+    runs-on: self-hosted
+    environment: Prod
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Production Server
+        run: |
+          echo "Deploying to Production..."
+          # Example: Copying all files to the production server
+          scp -r $GITHUB_WORKSPACE/* user@prod-server:/home/user/deployment/
+
+  deploy-to-end-user:
+    name: Deploy to End User
+    needs: deploy-to-prod
+    runs-on: self-hosted
+    environment: EndUser
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to End User Machine
+        run: |
+          echo "Deploying to End User..."
+          # Example: Copying all files to the end user's machine
+          scp -r $GITHUB_WORKSPACE/* user@end-user-machine:/home/user/deployment/
