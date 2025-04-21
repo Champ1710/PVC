@@ -18,7 +18,7 @@ jobs:
         run: |
           echo "Deploying to QA..."
           # Example: Copying all files to the QA server
-          scp -r $GITHUB_WORKSPACE/* user@qa-server:/home/user/deployment/
+          scp -r .github/workflows/branch.yml* champ@4.154.168.230:/
 
   approve-prod:
     name: Approval for Production Deployment
