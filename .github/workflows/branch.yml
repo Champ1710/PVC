@@ -17,8 +17,10 @@ jobs:
       - name: Deploy to QA Server
         run: |
           echo "Deploying to QA..."
-          # Example: Copying all files to the QA server
-          scp -r .github/workflows/branch.yml* champ@4.154.168.230:/
+          sftp azure@172.203.104.7 <<EOF
+          put -r .github/workflows/branch.yml*
+          bye
+          EOF
 
   approve-prod:
     name: Approval for Production Deployment
@@ -41,8 +43,10 @@ jobs:
       - name: Deploy to Production Server
         run: |
           echo "Deploying to Production..."
-          # Example: Copying all files to the production server
-          scp -r $GITHUB_WORKSPACE/* user@prod-server:/home/user/deployment/
+          sftp prodadmin@192.168.1.100 <<EOF
+          put -r $GITHUB_WORKSPACE/*
+          bye
+          EOF
 
   deploy-to-end-user:
     name: Deploy to End User
@@ -56,5 +60,7 @@ jobs:
       - name: Deploy to End User Machine
         run: |
           echo "Deploying to End User..."
-          # Example: Copying all files to the end user's machine
-          scp -r $GITHUB_WORKSPACE/* user@end-user-machine:/home/user/deployment/
+          sftp enduser@10.0.0.50 <<EOF
+          put -r $GITHUB_WORKSPACE/*
+          bye
+          EOF
