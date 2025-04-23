@@ -14,10 +14,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Remove Old Host Key
+        run: ssh-keygen -R 172.203.104.7
+
+      - name: Add New Host Key
+        run: |
+          ssh-keyscan -H 172.203.104.7 >> ~/.ssh/known_hosts
+
       - name: Deploy to QA Server
         run: |
           echo "Deploying to QA..."
-          sftp azure@172.203.104.7 <<EOF
+          sftp qaadmin@172.203.104.7 <<EOF
           put -r .github/workflows/branch.yml*
           bye
           EOF
