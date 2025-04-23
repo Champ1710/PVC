@@ -1,0 +1,79 @@
+name: Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Change if needed
+
+jobs:
+  deploy-to-qa:
+    name: Deploy to QA
+    runs-on: self-hosted  # Runs on Monroe/Azure runner
+    environment: QA
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Ensure .ssh Directory Exists
+        run: mkdir -p ~/.ssh
+
+      - name: Create known_hosts File if Not Exists
+        run: touch ~/.ssh/known_hosts
+
+      - name: Remove Old Host Key
+        run: ssh-keygen -R 172.203.104.7
+
+      - name: Add New Host Key
+        run: |
+          ssh-keyscan -H 172.203.104.7 >> ~/.ssh/known_hosts
+
+      - name: Deploy to QA Server
+        run: |
+          echo "Deploying to QA..."
+          sftp qaadmin@172.203.104.7 <<EOF
+          put -r .github/workflows/branch.yml*
+          bye
+          EOF
+
+  approve-prod:
+    name: Approval for Production Deployment
+    needs: deploy-to-qa
+    runs-on: ubuntu-latest
+    environment: Prod
+    steps:
+      - name: Wait for Manual Approval
+        run: echo "Manual approval required in GitHub UI"
+
+  deploy-to-prod:
+    name: Deploy to Production
+    needs: approve-prod
+    runs-on: self-hosted
+    environment: Prod
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Production Server
+        run: |
+          echo "Deploying to Production..."
+          sftp prodadmin@192.168.1.100 <<EOF
+          put -r $GITHUB_WORKSPACE/*
+          bye
+          EOF
+
+  deploy-to-end-user:
+    name: Deploy to End User
+    needs: deploy-to-prod
+    runs-on: self-hosted
+    environment: EndUser
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to End User Machine
+        run: |
+          echo "Deploying to End User..."
+          sftp enduser@10.0.0.50 <<EOF
+          put -r $GITHUB_WORKSPACE/*
+          bye
+          EOF
