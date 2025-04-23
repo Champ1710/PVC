@@ -30,7 +30,7 @@ jobs:
       - name: Deploy to QA Server
         run: |
           echo "Deploying to QA..."
-          sftp qaadmin@172.203.104.7 <<EOF
+          sftp azure@172.203.104.7 <<EOF
           put -r .github/workflows/branch.yml*
           bye
           EOF
