@@ -18,7 +18,6 @@ jobs:
         run: |
           echo "Deploying to Test..."
           
-
   developer:
     name: Developer
     needs: test
@@ -35,8 +34,6 @@ jobs:
           put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
-
-
   deploy-to-qa:
     name: Deploy to QA
     needs: Developer
@@ -53,7 +50,6 @@ jobs:
           put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
-
   deploy-to-qa3:
     name: Deploy to QA3
     needs: deploy-to-qa
@@ -70,7 +66,6 @@ jobs:
           put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
-
   approve-prod:
     name: Approval for Production Deployment
     needs: deploy-to-qa
@@ -98,7 +93,7 @@ jobs:
           
   deploy-to-prod:
     name: Deploy to Production
-    needs: deploy to qa3
+    needs: approve-prod
     runs-on: self-hosted
     environment: Prod
     steps:
