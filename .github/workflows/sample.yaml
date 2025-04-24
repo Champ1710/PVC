@@ -39,7 +39,7 @@ jobs:
 
   deploy-to-qa:
     name: Deploy to QA
-    needs:D8eveloper
+    needs: Developer
     runs-on: self-hosted  # Runs on Monroe/Azure runner
     environment: QA
     steps:
