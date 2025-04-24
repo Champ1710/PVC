@@ -82,7 +82,7 @@ jobs:
 
   ready-for-prod:
     name: Ready for Production
-    needs: deploy-to-PROC
+    needs: Deploy to Production
     runs-on: self-hosted
     environment: Ready_for_Prod
     steps:
