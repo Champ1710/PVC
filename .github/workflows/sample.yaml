@@ -68,7 +68,7 @@ jobs:
           EOF
   approve-prod:
     name: Approval for Production Deployment
-    needs: deploy-to-qa
+    needs: deploy-to-qa3
     runs-on: ubuntu-latest
     environment: Prod
     steps:
@@ -93,7 +93,7 @@ jobs:
           
   deploy-to-prod:
     name: Deploy to Production
-    needs: approve-prod
+    needs: ready-for-prod
     runs-on: self-hosted
     environment: Prod
     steps:
