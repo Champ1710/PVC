@@ -6,6 +6,22 @@ on:
       - main  # Change if needed
 
 jobs:
+  developer:
+    name: Developer
+    runs-on: self-hosted
+    environment: Developer
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Developer Server
+        run: |
+          echo "Deploying to Developer..."
+          sftp devadmin@10.239.80.216 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
+          bye
+          EOF
+
   test:
     name: Test
     needs: developer
@@ -19,22 +35,6 @@ jobs:
         run: |
           echo "Deploying to Test..."
           sftp testadmin@10.239.80.217 <<EOF
-          put -r .github/workflows/champ.yml* /schd_bncom/*
-          bye
-          EOF
-
-  developer:
-    name: Developer
-    runs-on: self-hosted
-    environment: Developer
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Developer Server
-        run: |
-          echo "Deploying to Developer..."
-          sftp devadmin@10.239.80.216 <<EOF
           put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
@@ -97,11 +97,10 @@ jobs:
           put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
-  
 
   deploy-to-PROC:
     name: Deploy to PROC
-    needs: deploy-to-end-user
+    needs: deploy-to-prod
     runs-on: self-hosted
     environment: PROC
     steps:
@@ -124,7 +123,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Deploy to Ready for Production Server
         run: |
           echo "Deploying to Ready for Production..."
@@ -132,8 +130,3 @@ jobs:
           put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
-
- 
-  
-
-
