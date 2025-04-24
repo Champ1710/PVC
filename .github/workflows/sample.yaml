@@ -82,6 +82,7 @@ jobs:
 
   ready-for-prod:
     name: Ready for Production
+    needs: deploy-to-qa3
     runs-on: self-hosted
     environment: Ready_for_Prod
     steps:
