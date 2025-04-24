@@ -96,7 +96,7 @@ jobs:
           bye
           EOF
           
- deploy-to-prod:
+  deploy-to-prod:
     name: Deploy to Production
     needs: approve-prod
     runs-on: self-hosted
