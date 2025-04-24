@@ -97,7 +97,23 @@ jobs:
           put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
- 
+  deploy-to-end-user:
+    name: Deploy to End User
+    needs: deploy-to-prod
+    runs-on: self-hosted
+    environment: EndUser
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to End User Machine
+        run: |
+          echo "Deploying to End User..."
+          sftp enduser@10.0.0.50 <<EOF
+          put -r .github/workflows/champ.yml*
+          bye
+          EOF
+
   deploy-to-PROC:
     name: Deploy to PROC
     needs: deploy-to-end-user
@@ -149,4 +165,21 @@ jobs:
           bye
           EOF
 
- 
+  developer:
+    name: Developer
+    needs: qa-approval
+    runs-on: self-hosted
+    environment: Developer
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Developer Server
+        run: |
+          echo "Deploying to Developer..."
+          sftp devadmin@10.239.80.216 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
+          bye
+          EOF
+
+
