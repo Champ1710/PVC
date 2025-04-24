@@ -53,15 +53,7 @@ jobs:
           bye
           EOF
   
-  approve-prod:
-    name: Approval for Production Deployment
-    needs: deploy-to-qa
-    runs-on: ubuntu-latest
-    environment: Prod
-    steps:
-      - name: Wait for Manual Approval
-        run: echo "Manual approval required in GitHub UI"
-
+  
   ready-for-prod:
     name: Ready for Production
     needs: deploy-to-qa
