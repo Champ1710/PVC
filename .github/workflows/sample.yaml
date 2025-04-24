@@ -98,7 +98,7 @@ jobs:
           
   deploy-to-prod:
     name: Deploy to Production
-    needs: Ready for Production
+    needs: deploy to qa3
     runs-on: self-hosted
     environment: Prod
     steps:
