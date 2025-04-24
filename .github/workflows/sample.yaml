@@ -99,7 +99,6 @@ jobs:
   deploy-to-prod:
     name: Deploy to Production
     needs: Ready for Production
-    needs: approve-prod
     runs-on: self-hosted
     environment: Prod
     steps:
