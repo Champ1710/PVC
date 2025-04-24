@@ -50,6 +50,9 @@ jobs:
           echo "Deploying to QA..."
           sftp qaadmin@10.239.80.211 <<EOF
           put -r .github/workflows/champ.yml* /schd_bncom/*
+          echo "Deploying to QA..."
+          sftp qaadmin@10.238.80.216 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
   
