@@ -23,19 +23,20 @@ jobs:
           bye
           EOF
 
-  deploy-to-DEV:
-    name: Deploy to DEV
-    runs-on: self-hosted  # Runs on Monroe/Azure runner
-    environment: DEV
+  developer:
+    name: Developer
+    needs: qa-approval
+    runs-on: self-hosted
+    environment: Developer
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to DEV Server
+      - name: Deploy to Developer Server
         run: |
-          echo "Deploying to DEV..."
-          sftp svc_pvcs@10.239.110.19 <<EOF
-          put -r .github/workflows/champ.yml*
+          echo "Deploying to Developer..."
+          sftp devadmin@10.239.80.216 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
 
@@ -133,38 +134,7 @@ jobs:
           bye
           EOF
 
-  qa-approval:
-    name: QA Approval
-    needs: ready-for-prod
-    runs-on: self-hosted
-    environment: QA_Approval
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to QA Approval Server
-        run: |
-          echo "Deploying to QA Approval..."
-          sftp qaapprovaladmin@10.239.80.215 <<EOF
-          put -r .github/workflows/champ.yml* /schd_bncom/*
-          bye
-          EOF
-
-  developer:
-    name: Developer
-    needs: qa-approval
-    runs-on: self-hosted
-    environment: Developer
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Developer Server
-        run: |
-          echo "Deploying to Developer..."
-          sftp devadmin@10.239.80.216 <<EOF
-          put -r .github/workflows/champ.yml* /schd_bncom/*
-          bye
-          EOF
+ 
+  
 
 
