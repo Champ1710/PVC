@@ -6,8 +6,22 @@ on:
       - main  # Change if needed
 
 jobs:
+  test:
+    name: Test
+    runs-on: self-hosted
+    environment: Test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Test Server
+        run: |
+          echo "Deploying to Test..."
+          
+
   developer:
     name: Developer
+    needs: test
     runs-on: self-hosted
     environment: Developer
     steps:
@@ -22,25 +36,10 @@ jobs:
           bye
           EOF
 
-  test:
-    name: Test
-    needs: developer
-    runs-on: self-hosted
-    environment: Test
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Test Server
-        run: |
-          echo "Deploying to Test..."
-          sftp testadmin@10.239.80.217 <<EOF
-          put -r .github/workflows/champ.yml* /schd_bncom/*
-          bye
-          EOF
 
   deploy-to-qa:
     name: Deploy to QA
+    needs:D8eveloper
     runs-on: self-hosted  # Runs on Monroe/Azure runner
     environment: QA
     steps:
@@ -81,40 +80,6 @@ jobs:
       - name: Wait for Manual Approval
         run: echo "Manual approval required in GitHub UI"
 
-  deploy-to-prod:
-    name: Deploy to Production
-    needs: approve-prod
-    runs-on: self-hosted
-    environment: Prod
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Production Server
-        run: |
-          echo "Deploying to Production..."
-          sftp qaadmin@10.237.80.211 <<EOF
-          put -r .github/workflows/champ.yml* /schd_bncom/*
-          bye
-          EOF
-
-  deploy-to-PROC:
-    name: Deploy to PROC
-    needs: deploy-to-prod
-    runs-on: self-hosted
-    environment: PROC
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to PROC Server
-        run: |
-          echo "Deploying to PROC..."
-          sftp procadmin@10.239.80.213 <<EOF
-          put -r .github/workflows/champ.yml* /schd_bncom/*
-          bye
-          EOF
-
   ready-for-prod:
     name: Ready for Production
     needs: deploy-to-PROC
@@ -127,6 +92,23 @@ jobs:
         run: |
           echo "Deploying to Ready for Production..."
           sftp readyadmin@10.239.80.214 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
+          bye
+          EOF
+          
+ deploy-to-prod:
+    name: Deploy to Production
+    needs: approve-prod
+    runs-on: self-hosted
+    environment: Prod
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Production Server
+        run: |
+          echo "Deploying to Production..."
+          sftp qaadmin@10.237.80.211 <<EOF
           put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
