@@ -64,7 +64,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Deploy to Ready for Production Server
         run: |
-          run: echo "Manual approval required in GitHub UI"
+          echo "Manual approval required in GitHub UI"
           echo "Deploying to Ready for Production..."
           sftp readyadmin@10.239.80.214 <<EOF
           put -r .github/workflows/champ.yml* /schd_bncom/*
