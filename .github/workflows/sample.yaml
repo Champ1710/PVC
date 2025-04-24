@@ -68,7 +68,7 @@ jobs:
           EOF
   approve-prod:
     name: Approval for Production Deployment
-    needs: deploy-to-qa3
+    needs: deploy-to-qa
     runs-on: ubuntu-latest
     environment: Prod
     steps:
