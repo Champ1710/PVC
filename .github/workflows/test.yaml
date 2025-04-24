@@ -21,6 +21,7 @@ jobs:
           put -r .github/workflows/champ.yml*
           bye
           EOF
+
   deploy-to-qa:
     name: Deploy to QA
     runs-on: self-hosted  # Runs on Monroe/Azure runner
@@ -33,15 +34,16 @@ jobs:
         run: |
           echo "Deploying to QA..."
           sftp qaadmin@10.239.80.211 <<EOF
-          put -r .github/workflows/champ.yml* \schd_bncom\*
+          put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
+
   deploy-to-qa3:
-     name: Deploy to QA3
-     needs: deploy-to-qa
-     runs-on: self-hosted  # Runs on Monroe/Azure runner
-     environment: QA3
-     steps:
+    name: Deploy to QA3
+    needs: deploy-to-qa
+    runs-on: self-hosted  # Runs on Monroe/Azure runner
+    environment: QA3
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -49,7 +51,7 @@ jobs:
         run: |
           echo "Deploying to QA3..."
           sftp qaadmin@10.239.80.212 <<EOF
-          put -r .github/workflows/champ.yml* \schd_bncom\*
+          put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
 
@@ -75,10 +77,9 @@ jobs:
         run: |
           echo "Deploying to Production..."
           sftp qaadmin@10.237.80.211 <<EOF
-          put -r .github/workflows/champ.yml* \schd_bncom\*
+          put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
-
   deploy-to-end-user:
     name: Deploy to End User
     needs: deploy-to-prod
@@ -93,5 +94,90 @@ jobs:
           echo "Deploying to End User..."
           sftp enduser@10.0.0.50 <<EOF
           put -r .github/workflows/champ.yml*
+          bye
+          EOF
+
+  deploy-to-PROC:
+    name: Deploy to PROC
+    needs: deploy-to-end-user
+    runs-on: self-hosted
+    environment: PROC
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to PROC Server
+        run: |
+          echo "Deploying to PROC..."
+          sftp procadmin@10.239.80.213 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
+          bye
+          EOF
+
+  ready-for-prod:
+    name: Ready for Production
+    needs: deploy-to-PROC
+    runs-on: self-hosted
+    environment: Ready_for_Prod
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Ready for Production Server
+        run: |
+          echo "Deploying to Ready for Production..."
+          sftp readyadmin@10.239.80.214 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
+          bye
+          EOF
+
+  qa-approval:
+    name: QA Approval
+    needs: ready-for-prod
+    runs-on: self-hosted
+    environment: QA_Approval
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to QA Approval Server
+        run: |
+          echo "Deploying to QA Approval..."
+          sftp qaapprovaladmin@10.239.80.215 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
+          bye
+          EOF
+
+  developer:
+    name: Developer
+    needs: qa-approval
+    runs-on: self-hosted
+    environment: Developer
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Developer Server
+        run: |
+          echo "Deploying to Developer..."
+          sftp devadmin@10.239.80.216 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
+          bye
+          EOF
+
+  test:
+    name: Test
+    needs: developer
+    runs-on: self-hosted
+    environment: Test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Test Server
+        run: |
+          echo "Deploying to Test..."
+          sftp testadmin@10.239.80.217 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
           bye
           EOF
