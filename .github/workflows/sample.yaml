@@ -82,7 +82,6 @@ jobs:
 
   ready-for-prod:
     name: Ready for Production
-    needs: Deploy to Production
     runs-on: self-hosted
     environment: Ready_for_Prod
     steps:
