@@ -25,7 +25,6 @@ jobs:
 
   developer:
     name: Developer
-    needs: qa-approval
     runs-on: self-hosted
     environment: Developer
     steps:
