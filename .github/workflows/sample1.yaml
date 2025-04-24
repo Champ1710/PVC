@@ -1,0 +1,96 @@
+
+name: Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Change if needed
+
+jobs:
+  test:
+    name: Test
+    runs-on: self-hosted
+    environment: Test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Test Server
+        run: |
+          echo "Deploying to Test..."
+          
+  developer:
+    name: Developer
+    needs: test
+    runs-on: self-hosted
+    environment: Developer
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Developer Server
+        run: |
+          echo "Deploying to Developer..."
+          sftp devadmin@10.239.80.216 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
+          bye
+          EOF
+          
+  deploy-to-qa:
+    name: Deploy to QA
+    needs: developer
+    runs-on: self-hosted  # Runs on Monroe/Azure runner
+    environment: QA
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to QA Server
+        run: |
+          echo "Deploying to QA..."
+          sftp qaadmin@10.239.80.211 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
+          bye
+          EOF
+  
+  approve-prod:
+    name: Approval for Production Deployment
+    needs: deploy-to-qa
+    runs-on: ubuntu-latest
+    environment: Prod
+    steps:
+      - name: Wait for Manual Approval
+        run: echo "Manual approval required in GitHub UI"
+
+  ready-for-prod:
+    name: Ready for Production
+    needs: deploy-to-qa
+    runs-on: self-hosted
+    environment: Ready_for_Prod
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Deploy to Ready for Production Server
+        run: |
+          echo "Deploying to Ready for Production..."
+          sftp readyadmin@10.239.80.214 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
+          bye
+          EOF
+          
+  deploy-to-prod:
+    name: Deploy to Production
+    needs: ready-for-prod
+    runs-on: self-hosted
+    environment: Prod
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Production Server
+        run: |
+          echo "Deploying to Production..."
+          sftp qaadmin@10.237.80.211 <<EOF
+          put -r .github/workflows/champ.yml* /schd_bncom/*
+          bye
+          EOF
