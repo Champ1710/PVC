@@ -1,0 +1,27 @@
+name: Sync DAGs to Airflow Servers
+
+on:
+  push:
+    paths:
+      - 'dags/dev/**'
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Sync files to servers
+        run: |
+          SERVERS=(
+            deus2airwrk01.hq.bn-corp.com
+            deus2airapp01.hq.bn-corp.com
+            deus2airapp02.hq.bn-corp.com
+          )
+          for SERVER in "${SERVERS[@]}"; do
+            echo "Syncing to $SERVER"
+            rsync -avz dags/dev/ airflow@$SERVER:/airflow/github/
+          done
