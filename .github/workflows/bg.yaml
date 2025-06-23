@@ -2,7 +2,9 @@ name: Sync DAGs to Airflow Servers
 
 on:
   push:
-     .github/workflows/deploy.yml/*
+    paths:
+      - 'dags/dev/**
+      
     branches:
       - main
 
