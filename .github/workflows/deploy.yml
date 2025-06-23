@@ -1,27 +1,40 @@
-name: Sync DAGs to Airflow Servers
+name: Build & Deploy Java App
 
 on:
   push:
-    paths:
-      - 'dags/dev/**'
-    branches:
-      - main
+    branches: [main]
 
-jobs:
-  sync:
-    runs-on: self-hosted
+jobs: 
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Sync files to Airflow servers
-        run: |
-          SERVERS=(
-            deus2airwrk01.hq.bn-corp.com
-            deus2airapp01.hq.bn-corp.com
-            deus2airapp02.hq.bn-corp.com
-          )
-          for SERVER in "${SERVERS[@]}"; do
-            echo "Syncing to $SERVER"
-            rsync -avz dags/dev/ airflow@$SERVER:/airflow/github/
-          done
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
+
+    - name: Save SSH key
+      run: |
+        echo "${{ secrets.DEPLOY_KEY }}" > deploy_key
+        chmod 600 deploy_key
+
+    - name: Copy .jar to VM
+      run: |
+        scp -o StrictHostKeyChecking=no -i deploy_key         target/*.jar ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/home/${{ secrets.DEPLOY_USER }}/app.jar
+
+    - name: SSH and restart app
+      run: |
+        ssh -o StrictHostKeyChecking=no -i deploy_key         ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << EOF
+        pkill -f 'java -jar' || true
+        nohup java -jar /home/${{ secrets.DEPLOY_USER }}/app.jar > app.log 2>&1 &Add commentMore actions
+        EOF
