@@ -3,8 +3,6 @@ name: Sync DAGs to Airflow Servers
 on:
   push:
     paths:
-      - 'dags/dev/**
-      
     branches:
       - main
 
