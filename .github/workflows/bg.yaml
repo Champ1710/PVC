@@ -3,6 +3,7 @@ name: Sync DAGs to Airflow Servers
 on:
   push:
     paths:
+      - 'dags/dev/**'
     branches:
       - main
 
@@ -13,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Sync files to servers
+      - name: Sync files to Airflow servers
         run: |
           SERVERS=(
             deus2airwrk01.hq.bn-corp.com
